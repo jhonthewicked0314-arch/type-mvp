@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Type MVP</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- This brings Supabase into our project for later -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+
+    <div class="container">
+        <!-- Header & Live Stats -->
+        <header>
+            <h1>Type MVP</h1>
+            <div class="stats">
+                <p>Time: <span id="timer">30</span>s</p>
+                <p>WPM: <span id="wpm">0</span></p>
+                <button id="restart-btn">Restart</button>
+            </div>
+        </header>
+
+        <!-- The Typing Area -->
+        <div id="typing-area">
+            <p id="words-display">the quick brown fox jumps over the lazy dog</p>
+            <!-- A hidden input box to capture mobile/desktop keyboards easily -->
+            <input type="text" id="hidden-input" autocomplete="off" autofocus>
+
+        </div>
+
+        <!-- History Area (For Supabase later) -->
+        <div id="history-section">
+            <h3>Your History</h3>
+            <p id="user-tag">User ID: Generating...</p>
+            <ul id="history-list">
+                <li>No history yet. Take a test!</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
