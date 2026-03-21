@@ -19,6 +19,8 @@
             <ul>
                 <li><a href="#" id="nav-main-test">Main Test</a></li>
                 <li><a href="#" id="nav-lessons">Lessons</a></li>
+                <!-- NEW: Awards Link -->
+                <li><a href="#" id="nav-awards">Awards & Stats</a></li>
             </ul>
         </nav>
 
@@ -112,6 +114,35 @@
             </div>
         </section>
 
+
+        <!-- NEW: Awards & Stats Section -->
+        <section id="awards-section" style="display: none;">
+            <h2>Your Awards & Stats</h2>
+
+            <div class="stats-grid">
+                <!-- Heatmap -->
+                <div class="heatmap-card">
+                    <h3>Key Error Heatmap</h3>
+                    <p class="heatmap-desc">Keys you miss the most across all tests.</p>
+                    <div id="keyboard-heatmap">
+                        <!-- JS will generate A-Z keys here -->
+                    </div>
+                </div>
+
+                <!-- Achievements -->
+                <div class="achievements-card">
+                    <h3>Achievements</h3>
+                    <div id="achievements-grid">
+                        <!-- JS will generate badges here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div> <!-- This is your existing closing tag for .container -->
+
+    <!-- NEW: Toast Notification Container (Floats on top of everything) -->
+    <div id="toast-container"></div>
 
     </div>
 

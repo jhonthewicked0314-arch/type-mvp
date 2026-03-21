@@ -73,8 +73,23 @@ if (!userId) {
 
 let wpmChartInstance = null; // NEW: Holds our chart so we can update it
 
+let currentTestErrors = {}; // Tracks mistakes in the current test
+let unlockedAchievementIds = []; // Stores what you've already won
+
+// The 6 Starter Achievements
+const ACHIEVEMENTS = [
+    { id: 'first_steps', title: 'First Steps', desc: 'Complete your first test.' },
+    { id: 'speed_demon', title: 'Speed Demon', desc: 'Reach 80+ WPM.' },
+    { id: 'perfectionist', title: 'Perfectionist', desc: 'Get 100% accuracy.' },
+    { id: 'marathon', title: 'Marathon', desc: 'Complete a 120s test.' },
+    { id: 'night_owl', title: 'Night Owl', desc: 'Type in dark mode.' },
+    { id: 'flash', title: 'The Flash', desc: 'Reach 100+ WPM.' }
+];
+
 // --- 4. INITIALIZATION & RESTART LOGIC (Main Test) ---
 function setupGame() {
+    currentTestErrors = {}; // Reset error tracking for the new test
+
     clearInterval(timerInterval);
     timeLeft = testTime;
     isPlaying = false;
@@ -124,7 +139,14 @@ function handleInputLogic() {
         } else {
             span.classList.add('incorrect');
             span.classList.remove('correct');
-            if (index === typedArray.length - 1) playError();
+
+            // NEW: Track the specific letter they missed (only letters a-z)
+            const expectedChar = span.innerText.toLowerCase();
+            if (expectedChar.match(/[a-z]/)) {
+                currentTestErrors[expectedChar] = (currentTestErrors[expectedChar] || 0) + 1;
+            }
+
+            if (typedArray.length > document.querySelectorAll('.correct, .incorrect').length - 1) playError();
         }
     });
 
@@ -176,8 +198,29 @@ async function endGame() {
 
     wpmDisplay.innerText = wpm;
 
+    // 1. Save standard score
     await saveScore(wpm, accuracy);
+
+    // 2. Save Heatmap errors (if any)
+    if (Object.keys(currentTestErrors).length > 0) {
+        await fetch(`${supabaseUrl}/rest/v1/user_heatmap`, {
+            method: 'POST',
+            headers: {
+                'apikey': supabaseKey,
+                'Authorization': `Bearer ${supabaseKey}`,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=minimal'
+            },
+            body: JSON.stringify({ user_id: userId, missed_keys: currentTestErrors })
+        });
+    }
+
+    // 3. Check for Achievements
+    await checkAchievements(wpm, accuracy);
+
+    // 4. Reload UI
     await loadHistory();
+    await loadAwardsAndHeatmap(); // We will create this function next
 }
 
 // --- 8. DATABASE FUNCTIONS ---
@@ -195,6 +238,105 @@ async function saveScore(wpm, accuracy) {
     if (!response.ok) console.error("Error saving to database:", await response.text());
 }
 
+// --- GAMIFICATION FUNCTIONS ---
+
+function showToast(title) {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.innerHTML = `🏆 Achievement Unlocked: <br/><strong>${title}</strong>`;
+    if (isSoundOn) playClick(); // Happy chime!
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 5000);
+}
+
+async function checkAchievements(wpm, accuracy) {
+    const newUnlocks = [];
+
+    // Evaluate rules
+    if (!unlockedAchievementIds.includes('first_steps')) newUnlocks.push('first_steps');
+    if (wpm >= 80 && !unlockedAchievementIds.includes('speed_demon')) newUnlocks.push('speed_demon');
+    if (wpm >= 100 && !unlockedAchievementIds.includes('flash')) newUnlocks.push('flash');
+    if (accuracy === 100 && wpm > 0 && !unlockedAchievementIds.includes('perfectionist')) newUnlocks.push('perfectionist');
+    if (testTime === 120 && !unlockedAchievementIds.includes('marathon')) newUnlocks.push('marathon');
+    if (!document.body.classList.contains('light-theme') && !unlockedAchievementIds.includes('night_owl')) newUnlocks.push('night_owl');
+
+    // Save & Notify
+    for (const id of newUnlocks) {
+        unlockedAchievementIds.push(id);
+        const achievement = ACHIEVEMENTS.find(a => a.id === id);
+        showToast(achievement.title);
+
+        await fetch(`${supabaseUrl}/rest/v1/user_achievements`, {
+            method: 'POST',
+            headers: {
+                'apikey': supabaseKey,
+                'Authorization': `Bearer ${supabaseKey}`,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=minimal'
+            },
+            body: JSON.stringify({ user_id: userId, achievement_id: id })
+        });
+    }
+}
+
+async function loadAwardsAndHeatmap() {
+    // 1. Load Achievements
+    let achData = null;
+    try {
+        const achRes = await fetch(`${supabaseUrl}/rest/v1/user_achievements?select=achievement_id&user_id=eq.${userId}`, {
+            headers: { 'apikey': supabaseKey, 'Authorization': `Bearer ${supabaseKey}` }
+        });
+        if (achRes.ok) achData = await achRes.json();
+    } catch(e) { console.error(e); }
+
+    if (achData) unlockedAchievementIds = achData.map(a => a.achievement_id);
+
+    const grid = document.getElementById('achievements-grid');
+    grid.innerHTML = '';
+    ACHIEVEMENTS.forEach(ach => {
+        const isUnlocked = unlockedAchievementIds.includes(ach.id);
+        grid.innerHTML += `
+            <div class="badge ${isUnlocked ? 'unlocked' : ''}">
+                <h4>${ach.title}</h4>
+                <p>${ach.desc}</p>
+            </div>
+        `;
+    });
+
+    // 2. Load Heatmap Data
+    let heatData = null;
+    try {
+        const heatRes = await fetch(`${supabaseUrl}/rest/v1/user_heatmap?select=missed_keys&user_id=eq.${userId}`, {
+            headers: { 'apikey': supabaseKey, 'Authorization': `Bearer ${supabaseKey}` }
+        });
+        if (heatRes.ok) heatData = await heatRes.json();
+    } catch(e) { console.error(e); }
+
+    // Tally all historical errors
+    let totalErrors = {};
+    if (heatData) {
+        heatData.forEach(row => {
+            for (const [key, count] of Object.entries(row.missed_keys)) {
+                totalErrors[key] = (totalErrors[key] || 0) + count;
+            }
+        });
+    }
+
+    // Render A-Z Keyboard
+    const kbContainer = document.getElementById('keyboard-heatmap');
+    kbContainer.innerHTML = '';
+    const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
+
+    alphabet.forEach(letter => {
+        const errCount = totalErrors[letter] || 0;
+        let colorClass = 'good'; // Default green
+        if (errCount > 10) colorClass = 'danger'; // Red
+        else if (errCount > 3) colorClass = 'warning'; // Yellow
+
+        kbContainer.innerHTML += `<div class="key-box ${colorClass}" title="${errCount} mistakes">${letter}</div>`;
+    });
+}
 // --- 8. DATABASE & CHART FUNCTIONS ---
 async function loadHistory() {
     // 1. Fetch the last 20 scores instead of 5
@@ -378,6 +520,24 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('keyup', (e) => {
         if (e.key === 'Tab') isTabPressed = false;
     });
+
+    // Inside DOMContentLoaded: Grab elements
+    const navAwards = document.getElementById('nav-awards');
+    const awardsSection = document.getElementById('awards-section');
+
+    // Inside DOMContentLoaded: Setup Nav logic
+    navAwards.addEventListener('click', (e) => {
+        e.preventDefault();
+        mainTestSection.style.display = 'none';
+        if (typeof lessonsSection !== 'undefined') lessonsSection.style.display = 'none';
+        awardsSection.style.display = 'block';
+
+        loadAwardsAndHeatmap(); // Load data from Supabase when clicked!
+    });
+
+    // *Important:* Go to your navMainTest click listener and add:
+    // awardsSection.style.display = 'none';
+
 
 
     // Start everything initially for the main test

@@ -455,3 +455,157 @@ body.light-theme kbd {
 body.light-theme .chart-container {
     background-color: #f5f5f5;
 }
+
+/* --- DEPLOYMENT 3: GAMIFICATION --- */
+
+/* Layout */
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 30px;
+    margin-top: 20px;
+}
+
+/* Heatmap */
+.heatmap-card,
+.achievements-card {
+    background-color: #242526;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+body.light-theme .heatmap-card,
+body.light-theme .achievements-card {
+    background-color: #e2e2e2;
+}
+
+.heatmap-desc {
+    font-size: 0.9rem;
+    color: #646669;
+    margin-bottom: 15px;
+}
+
+#keyboard-heatmap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+}
+
+.key-box {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #2c2e31;
+    border-radius: 4px;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: 0.3s;
+}
+
+body.light-theme .key-box {
+    background-color: #d1d1d1;
+}
+
+/* Heatmap Colors */
+.key-box.good {
+    background-color: #4CAF50;
+    color: white;
+}
+
+/* Green */
+.key-box.warning {
+    background-color: #e2b714;
+    color: black;
+}
+
+/* Yellow */
+.key-box.danger {
+    background-color: #ca4754;
+    color: white;
+}
+
+/* Red */
+
+/* Achievements Grid */
+#achievements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+}
+
+.badge {
+    background-color: #2c2e31;
+    border: 2px dashed #646669;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    opacity: 0.5;
+    filter: grayscale(100%);
+    transition: 0.3s;
+}
+
+.badge.unlocked {
+    border: 2px solid #e2b714;
+    opacity: 1;
+    filter: grayscale(0%);
+    background-color: rgba(226, 183, 20, 0.1);
+}
+
+.badge h4 {
+    margin: 0 0 5px 0;
+    color: #e2b714;
+    font-size: 1rem;
+}
+
+.badge p {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #d1d0c5;
+}
+
+body.light-theme .badge p {
+    color: #323437;
+}
+
+/* Toast Notifications */
+#toast-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 1000;
+}
+
+.toast {
+    background-color: #e2b714;
+    color: #323437;
+    padding: 15px 20px;
+    border-radius: 5px;
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    animation: slideIn 0.5s ease-out, fadeOut 0.5s ease-in 4.5s forwards;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    to {
+        opacity: 0;
+        visibility: hidden;
+    }
+}
