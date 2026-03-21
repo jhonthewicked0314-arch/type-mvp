@@ -25,38 +25,29 @@ let isPlaying = false;
 let isSoundOn = false; // NEW: Sound state
 let isTabPressed = false; // NEW: Shortcut state
 
-// --- WEB AUDIO API (SYNTH SOUNDS) ---
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+// --- CUSTOM AUDIO FILES ---
+// NOTE: Change these filenames to match whatever you named your downloaded files!
+// For now, I put temporary URLs to real mechanical keyboard sounds so you can test it immediately.
+const clickSoundUrl = 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3';
+const errorSoundUrl = 'https://assets.mixkit.co/active_storage/sfx/2570/2570-preview.mp3';
 
 function playClick() {
     if (!isSoundOn) return;
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-    const osc = audioCtx.createOscillator();
-    const gainNode = audioCtx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(800, audioCtx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.05);
-    gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
-    osc.connect(gainNode);
-    gainNode.connect(audioCtx.destination);
-    osc.start();
-    osc.stop(audioCtx.currentTime + 0.05);
+
+    // We create a new audio object on every click so fast typing doesn't cut off the sound
+    const clickAudio = new Audio(clickSoundUrl);
+    clickAudio.volume = 0.4; // Adjust volume here (0.0 to 1.0)
+
+    // The .catch() prevents the browser from throwing red errors if you type too fast
+    clickAudio.play().catch(e => { });
 }
 
 function playError() {
     if (!isSoundOn) return;
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-    const osc = audioCtx.createOscillator();
-    const gainNode = audioCtx.createGain();
-    osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-    gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
-    osc.connect(gainNode);
-    gainNode.connect(audioCtx.destination);
-    osc.start();
-    osc.stop(audioCtx.currentTime + 0.2);
+
+    const errorAudio = new Audio(errorSoundUrl);
+    errorAudio.volume = 0.5; // Make the error slightly louder if you want
+    errorAudio.play().catch(e => { });
 }
 
 // Our dictionary of words
@@ -78,12 +69,12 @@ let unlockedAchievementIds = []; // Stores what you've already won
 
 // The 6 Starter Achievements
 const ACHIEVEMENTS = [
-    { id: 'first_steps', title: 'First Steps', desc: 'Complete your first test.' },
-    { id: 'speed_demon', title: 'Speed Demon', desc: 'Reach 80+ WPM.' },
-    { id: 'perfectionist', title: 'Perfectionist', desc: 'Get 100% accuracy.' },
-    { id: 'marathon', title: 'Marathon', desc: 'Complete a 120s test.' },
-    { id: 'night_owl', title: 'Night Owl', desc: 'Type in dark mode.' },
-    { id: 'flash', title: 'The Flash', desc: 'Reach 100+ WPM.' }
+    { id: 'first_steps', title: 'Onboarding Complete', desc: 'Completed the initial benchmark test.' },
+    { id: 'speed_demon', title: 'Office Standard', desc: 'Maintained 40+ WPM. Standard for admin tasks.' },
+    { id: 'flash', title: 'Professional Typist', desc: 'Reached 80+ WPM. Elite efficiency.' },
+    { id: 'perfectionist', title: 'Absolute Focus', desc: 'Achieved 100% accuracy on a full test.' },
+    { id: 'marathon', title: 'Endurance Test', desc: 'Completed a 120s extended session.' },
+    { id: 'night_owl', title: 'Midnight Shift', desc: 'Practiced using the dark theme.' }
 ];
 let lastCompletedTestErrors = {}; // NEW: Remembers your last test even if you click away
 let previousInputLength = 0; // NEW: Helps us stop duplicate counting

@@ -4,167 +4,340 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Type MVP</title>
+    <title>TypeMaster Pro | Professional Typing Analysis</title>
+
+    <!-- Professional Typography: Inter for UI, Fira Code for typing -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 
-    <!-- NEW: Chart.js for the WPM Graph -->
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
 
-    <div class="container">
-        <nav id="main-nav">
-            <h1 id="site-title">Type MVP</h1>
-            <ul>
-                <li><a href="#" id="nav-main-test">Main Test</a></li>
-                <li><a href="#" id="nav-lessons">Lessons</a></li>
-                <!-- NEW: Awards Link -->
-                <li><a href="#" id="nav-awards">Awards & Stats</a></li>
-            </ul>
-        </nav>
-
-
-
-        <div id="main-test-section">
-            <!-- Header & Live Stats -->
-            <!-- Header & Live Stats -->
-            <header>
-                <!-- NEW: Top Controls (Theme & Sound) -->
-                <div class="top-controls">
-                    <button id="theme-toggle" title="Toggle Light/Dark Theme">☀️</button>
-                    <button id="sound-toggle" title="Toggle Sound">🔇</button>
-                </div>
-
-                <!-- NEW: Custom Timer Selectors -->
-                <div class="time-selectors">
-                    <button class="time-btn" data-time="15">15s</button>
-                    <button class="time-btn active" data-time="30">30s</button>
-                    <button class="time-btn" data-time="60">60s</button>
-                    <button class="time-btn" data-time="120">120s</button>
-                </div>
-
-                <div class="stats">
-                    <p>Time: <span id="timer">30</span>s</p>
-                    <p>WPM: <span id="wpm">0</span></p>
-                    <button id="restart-btn">Restart</button>
-                </div>
-
-                <!-- NEW: Visual Timer Bar -->
-                <div id="timer-bar-container">
-                    <div id="timer-bar"></div>
-                </div>
-                <!-- NEW: Shortcut Hint -->
-                <p class="shortcut-hint">Shortcut: <kbd>Tab</kbd> + <kbd>Enter</kbd> to restart test</p>
-            </header>
-
-            <!-- The Typing Area -->
-            <div id="typing-area">
-                <p id="words-display">the quick brown fox jumps over the lazy dog</p>
-                <!-- A hidden input box to capture mobile/desktop keyboards easily -->
-                <input type="text" id="hidden-input" autocomplete="off">
-
+    <!-- PROFESSIONAL HEADER -->
+    <header class="global-header">
+        <div class="header-container">
+            <div class="logo-area">
+                <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect>
+                    <path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M6 12h.01M10 12h.01M14 12h.01M18 12h.01M7 16h10"></path>
+                </svg>
+                <h1 id="site-title">TypeMaster</h1>
             </div>
 
-            <!-- History Area (For Supabase later) -->
-            <!-- History Area (For Supabase later) -->
-            <div id="history-section">
-                <h3>Your History</h3>
-                <p id="user-tag">User ID: Generating...</p>
-
-                <!-- NEW: WPM Chart Canvas -->
-                <div class="chart-container" style="position: relative; height:200px; width:100%; margin-bottom: 20px;">
-                    <canvas id="wpmChart"></canvas>
-                </div>
-
-                <ul id="history-list">
-                    <li>No history yet. Take a test!</li>
+            <nav id="main-nav">
+                <ul class="nav-links">
+                    <li><a href="#" id="nav-main-test" class="active">Practice</a></li>
+                    <li><a href="#" id="nav-lessons">Curriculum</a></li>
+                    <li><a href="#" id="nav-awards">Analytics</a></li>
+                    <li><a href="#ergonomics-section" class="dummy-link">Pro Tips</a></li>
                 </ul>
+            </nav>
+
+            <div class="header-actions">
+                <button id="theme-toggle" class="icon-btn" title="Toggle Theme">☀️</button>
+                <button id="sound-toggle" class="icon-btn" title="Toggle Sound">🔇</button>
+                <a href="#" class="btn-secondary dummy-link">Log In</a>
+                <a href="#practice-workspace" class="btn-primary">Start Typing</a>
             </div>
         </div>
+    </header>
 
-        <!-- NEW: Lessons Section -->
-        <section id="lessons-section" style="display: none;">
-            <h2>Typing Lessons</h2>
+    <!-- MAIN WRAPPER -->
+    <main class="content-wrapper">
 
-            <!-- Lessons List / Menu -->
-            <div id="lessons-menu-display">
-                <ul id="lesson-list">
-                    <!-- Lesson items will be injected here by JS -->
+        <!-- ==========================================
+             PAGE 1: MAIN TEST & HOMEPAGE CONTENT
+        =========================================== -->
+        <div id="main-test-section" class="page-section fade-in">
+
+            <!-- HERO BANNER -->
+            <section class="hero-section">
+                <div class="hero-content">
+                    <span class="badge-label">Trusted by Professionals</span>
+                    <h2 class="hero-title">Elevate Your Typing Speed to Professional Standards.</h2>
+                    <p class="hero-subtitle">Stop looking at your keyboard. Develop flawless muscle memory with our
+                        biomechanical analysis engine and tailored curriculums.</p>
+                    <div class="hero-buttons">
+                        <a href="#practice-workspace" class="btn-primary large">Take the Benchmark Test</a>
+                        <a href="#" class="btn-text dummy-link">View Typing Standards →</a>
+                    </div>
+                </div>
+                <div class="hero-visual">
+                    <!-- Placeholder for a 3D Keyboard/Illustration -->
+                    <img src="https://images.unsplash.com/photo-1595225476474-87563907a212?q=80&w=2071&auto=format&fit=crop"
+                        alt="Mechanical Keyboard" class="floating-img">
+                </div>
+            </section>
+
+            <!-- THE CORE APP WORKSPACE -->
+            <section id="practice-workspace" class="app-workspace">
+                <div class="workspace-header">
+                    <h3>Benchmark Test</h3>
+                    <p>Click the text area to begin. The timer starts on your first keystroke.</p>
+                </div>
+
+                <div class="app-card shadow-lg">
+                    <header class="test-controls">
+                        <div class="time-selectors">
+                            <button class="time-btn" data-time="15">15s</button>
+                            <button class="time-btn active" data-time="30">30s</button>
+                            <button class="time-btn" data-time="60">60s</button>
+                            <button class="time-btn" data-time="120">120s</button>
+                        </div>
+
+                        <div class="live-stats">
+                            <div class="stat-box">
+                                <span class="stat-label">Time</span>
+                                <span class="stat-value" id="timer">30<small>s</small></span>
+                            </div>
+                            <div class="stat-box">
+                                <span class="stat-label">Speed</span>
+                                <span class="stat-value highlight" id="wpm">0<small>WPM</small></span>
+                            </div>
+                            <button id="restart-btn" class="icon-btn restart-action" title="Restart Test">↻</button>
+                        </div>
+                    </header>
+
+                    <div id="timer-bar-container">
+                        <div id="timer-bar"></div>
+                    </div>
+
+                    <div id="typing-area">
+                        <p id="words-display">the quick brown fox jumps over the lazy dog</p>
+                        <input type="text" id="hidden-input" autocomplete="off">
+                    </div>
+
+                    <div class="workspace-footer">
+                        <p class="shortcut-hint"><kbd>Tab</kbd> + <kbd>Enter</kbd> to restart instantly</p>
+                    </div>
+                </div>
+
+                <!-- History Chart Area -->
+                <div id="history-section" class="app-card mt-30">
+                    <div class="history-header">
+                        <h3>Performance History</h3>
+                        <p id="user-tag" class="user-id-badge">ID: Generating...</p>
+                    </div>
+
+                    <div class="chart-container">
+                        <canvas id="wpmChart"></canvas>
+                    </div>
+
+                    <ul id="history-list" class="clean-list">
+                        <li class="empty-state">No history recorded yet. Complete your first test.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- DUMMY CONTENT: BENCHMARKS -->
+            <section class="info-section bg-soft">
+                <div class="section-title-center">
+                    <h2>Real-World Typing Benchmarks</h2>
+                    <p>Where does your speed place you in the professional world?</p>
+                </div>
+                <div class="benchmark-grid">
+                    <div class="bench-card">
+                        <div class="bench-speed">40 <span>WPM</span></div>
+                        <h4>Average Standard</h4>
+                        <p>The global average. Sufficient for basic emails and casual browsing.</p>
+                    </div>
+                    <div class="bench-card">
+                        <div class="bench-speed">60 <span>WPM</span></div>
+                        <h4>College Level</h4>
+                        <p>Standard for students and entry-level administrative tasks.</p>
+                    </div>
+                    <div class="bench-card">
+                        <div class="bench-speed highlight">80 <span>WPM</span></div>
+                        <h4>Professional</h4>
+                        <p>Required for dispatchers, coders, and high-efficiency office workers.</p>
+                    </div>
+                    <div class="bench-card">
+                        <div class="bench-speed">120+ <span>WPM</span></div>
+                        <h4>Executive / Coder</h4>
+                        <p>Top 1% of typists. Thoughts translate to text almost instantly.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- DUMMY CONTENT: ERGONOMICS -->
+            <section id="ergonomics-section" class="info-section split-section">
+                <div class="split-text">
+                    <h2>Ergonomics & Posture</h2>
+                    <p>Typing fast isn't just about your fingers; it's about your whole body. Prevent strain and
+                        increase endurance with proper form.</p>
+                    <ul class="check-list">
+                        <li>Keep your wrists hovering, not resting on the desk.</li>
+                        <li>Position your monitor at eye level to prevent neck strain.</li>
+                        <li>Keep your feet flat on the floor for core stability.</li>
+                    </ul>
+                    <a href="#" class="btn-text dummy-link">Read our full health guide →</a>
+                </div>
+                <div class="split-visual">
+                    <img src="https://images.unsplash.com/photo-1544383835-bda2bc66a55d?q=80&w=2036&auto=format&fit=crop"
+                        alt="Ergonomic Workspace" class="rounded-img shadow-md">
+                </div>
+            </section>
+        </div>
+
+        <!-- ==========================================
+             PAGE 2: LESSONS / CURRICULUM
+        =========================================== -->
+        <section id="lessons-section" class="page-section fade-in" style="display: none;">
+            <div class="page-header">
+                <h2>Structured Curriculum</h2>
+                <p>Build your foundation. Practice specific finger groups to eliminate biomechanical weaknesses.</p>
+            </div>
+
+            <div id="lessons-menu-display" class="curriculum-grid">
+                <ul id="lesson-list" class="lesson-cards">
+                    <!-- Injected by JS -->
                 </ul>
             </div>
 
-            <!-- Specific Lesson Test Area -->
-            <div id="lesson-test-area" style="display: none;">
-                <h3 id="lesson-title"></h3>
-                <p id="lesson-instructions"></p>
-                <div class="lesson-stats"> <!-- NEW: Container for lesson stats -->
-                    <p>Time: <span id="lesson-timer">60</span>s</p> <!-- NEW: Lesson Timer -->
+            <div id="lesson-test-area" class="app-card shadow-lg" style="display: none;">
+                <div class="lesson-test-header">
+                    <h3 id="lesson-title"></h3>
+                    <p id="lesson-instructions"></p>
+                    <div class="stat-box mt-10">
+                        <span class="stat-label">Time Remaining</span>
+                        <span class="stat-value" id="lesson-timer">60<small>s</small></span>
+                    </div>
                 </div>
-                <p id="lesson-words-display"></p>
-                <input type="text" id="lesson-input" autocomplete="off">
 
-                <div id="lesson-results" style="display: none;">
-                    <h4>Lesson Results</h4>
-                    <p>WPM: <span id="lesson-wpm">0</span></p>
-                    <p>Accuracy: <span id="lesson-accuracy">0%</span></p>
-                    <button id="lesson-restart-btn">Try Again</button>
-                    <button id="back-to-lessons-menu-btn">Back to Lessons</button>
+                <p id="lesson-words-display" class="typing-text-large"></p>
+                <input type="text" id="lesson-input" class="modern-input" autocomplete="off"
+                    placeholder="Start typing here...">
+
+                <div id="lesson-results" class="results-panel" style="display: none;">
+                    <div class="results-header">
+                        <h4>Session Complete</h4>
+                    </div>
+                    <div class="results-stats">
+                        <div class="r-stat"><span class="label">Speed</span><span id="lesson-wpm"
+                                class="value highlight">0</span> WPM</div>
+                        <div class="r-stat"><span class="label">Accuracy</span><span id="lesson-accuracy"
+                                class="value">0%</span></div>
+                    </div>
+                    <div class="results-actions">
+                        <button id="lesson-restart-btn" class="btn-primary">Retry Lesson</button>
+                        <button id="back-to-lessons-menu-btn" class="btn-secondary">View All Lessons</button>
+                    </div>
                 </div>
             </div>
         </section>
 
+        <!-- ==========================================
+             PAGE 3: AWARDS & ANALYSIS
+        =========================================== -->
+        <section id="awards-section" class="page-section fade-in" style="display: none;">
+            <div class="page-header">
+                <h2>Performance Analytics</h2>
+                <p>Deep insights into your typing biomechanics and historical milestones.</p>
+            </div>
 
-        <!-- NEW: Awards & Stats Section -->
-        <section id="awards-section" style="display: none;">
-            <h2>Your Awards & Stats</h2>
-
-            <div class="stats-grid">
-                <!-- Heatmap -->
+            <div class="analytics-grid">
                 <!-- Post-Match Analysis -->
-                <div class="heatmap-card">
-                    <h3>Last Test Analysis</h3>
-                    <p class="heatmap-desc">Mistakes made in your <strong>most recent test</strong>.</p>
+                <div class="heatmap-card app-card shadow-sm">
+                    <div class="card-title-row">
+                        <h3>Diagnostic Heatmap</h3>
+                        <span class="badge-label">Last Session</span>
+                    </div>
+                    <p class="text-muted mb-20">Visual mapping of errors from your most recent test.</p>
 
                     <div id="keyboard-heatmap">
-                        <!-- JS will generate A-Z keys here -->
+                        <!-- JS generates keys here -->
                     </div>
 
-                    <!-- Biomechanical Diagnostic Panel -->
-                    <div id="diagnostic-panel" style="display: none;">
-                        <h4>Action Report</h4>
-                        <p>Most Missed Finger: <strong id="weakest-finger-name">N/A</strong></p>
-                        <p id="weakest-finger-stats">You missed keys with this finger 0 times.</p>
-                        <button id="recommended-lesson-btn">Practice This Finger</button>
+                    <div id="diagnostic-panel" class="diagnostic-box" style="display: none;">
+                        <div class="diag-header">
+                            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2"
+                                fill="none">
+                                <path
+                                    d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z">
+                                </path>
+                                <line x1="12" y1="9" x2="12" y2="13"></line>
+                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                            </svg>
+                            <h4>Action Required</h4>
+                        </div>
+                        <p>Focal Weakness: <strong id="weakest-finger-name" class="highlight">N/A</strong></p>
+                        <p id="weakest-finger-stats" class="text-sm">You missed keys with this finger 0 times.</p>
+                        <button id="recommended-lesson-btn" class="btn-primary mt-15">Start Prescribed Lesson</button>
                     </div>
 
-                    <!-- Perfect Test Message -->
-                    <div id="perfect-test-panel"
-                        style="display: none; margin-top: 20px; color: #4CAF50; font-weight: bold;">
-                        🌟 Flawless! 0 mistakes on your last test.
+                    <div id="perfect-test-panel" class="diagnostic-box success" style="display: none;">
+                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2"
+                            fill="none">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                        <span>Flawless execution. 0 errors detected.</span>
                     </div>
                 </div>
 
                 <!-- Achievements -->
-                <div class="achievements-card">
-                    <h3>Achievements</h3>
+                <div class="achievements-card app-card shadow-sm">
+                    <h3>Milestones & Certifications</h3>
+                    <p class="text-muted mb-20">Unlock professional benchmarks as you progress.</p>
                     <div id="achievements-grid">
-                        <!-- JS will generate badges here -->
+                        <!-- JS generates badges here -->
                     </div>
                 </div>
             </div>
         </section>
 
-    </div> <!-- This is your existing closing tag for .container -->
+    </main>
 
-    <!-- NEW: Toast Notification Container (Floats on top of everything) -->
+    <!-- PROFESSIONAL FOOTER -->
+    <footer class="global-footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="logo-area">
+                    <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect>
+                        <path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M6 12h.01M10 12h.01M14 12h.01M18 12h.01M7 16h10">
+                        </path>
+                    </svg>
+                    <h2>TypeMaster</h2>
+                </div>
+                <p>Advanced typing analytics and biomechanical training for professionals.</p>
+            </div>
+
+            <div class="footer-links">
+                <div class="link-column">
+                    <h4>Platform</h4>
+                    <a href="#" class="dummy-link">Benchmark Test</a>
+                    <a href="#" class="dummy-link">Curriculum</a>
+                    <a href="#" class="dummy-link">Leaderboards</a>
+                </div>
+                <div class="link-column">
+                    <h4>Resources</h4>
+                    <a href="#" class="dummy-link">Ergonomics Guide</a>
+                    <a href="#" class="dummy-link">Hardware Reviews</a>
+                    <a href="#" class="dummy-link">API Documentation</a>
+                </div>
+                <div class="link-column">
+                    <h4>Company</h4>
+                    <a href="#" class="dummy-link">About Us</a>
+                    <a href="#" class="dummy-link">Privacy Policy</a>
+                    <a href="#" class="dummy-link">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 TypeMaster Pro. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Toast Notification Container -->
     <div id="toast-container"></div>
 
-    </div>
-
-
-
-
+    <!-- Scripts -->
     <script src="script.js"></script>
     <script src="lessons.js"></script>
 </body>
