@@ -3,7 +3,13 @@
 // --- 1. SUPABASE CONNECTION ---
 const supabaseUrl = 'https://kolayolotgsejhwrsbyq.supabase.co';
 const supabaseKey = 'sb_publishable_0g_gJHK8gJka59sAeJc7aw_1SQ58e0p';
-const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey, {
+    auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+        detectSessionInUrl: false
+    }
+});
 
 // --- 2. DOM ELEMENTS ---
 // Declared globally, assigned inside DOMContentLoaded
@@ -17,10 +23,47 @@ let userTag;
 let mainTestSection; // NEW: Declare mainTestSection here
 
 // --- 3. GAME VARIABLES ---
-const testTime = 30;
+// --- 3. GAME VARIABLES ---
+let testTime = 30; // Changed from const to let so we can modify it
 let timeLeft = testTime;
 let timerInterval = null;
 let isPlaying = false;
+let isSoundOn = false; // NEW: Sound state
+let isTabPressed = false; // NEW: Shortcut state
+
+// --- WEB AUDIO API (SYNTH SOUNDS) ---
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function playClick() {
+    if (!isSoundOn) return;
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const osc = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.05);
+    gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+    osc.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.05);
+}
+
+function playError() {
+    if (!isSoundOn) return;
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const osc = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+    gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+    osc.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.2);
+}
 
 // Our dictionary of words
 const wordsList = ["the", "be", "to", "of", "and", "a", "in", "that", "have", "I", "it", "for", "not", "on", "with", "he", "as", "you", "do", "at", "this", "but", "his", "by", "from", "they", "we", "say", "her", "she", "or", "an", "will", "my", "one", "all", "would", "there", "their", "what", "so", "up", "out", "if", "about", "who", "get", "which", "go", "me"];
@@ -81,21 +124,37 @@ function handleInputLogic() {
             span.classList.add('correct');
             span.classList.remove('incorrect');
             correctCount++;
+            if (index === typedArray.length - 1) playClick();
         } else {
             span.classList.add('incorrect');
             span.classList.remove('correct');
+            if (index === typedArray.length - 1) playError();
         }
     });
 
     if (typedArray.length === spans.length) endGame();
 }
 
-
+// --- 6. THE TIMER LOGIC (Main Test) ---
 // --- 6. THE TIMER LOGIC (Main Test) ---
 function startTimer() {
+    const timerBar = document.getElementById('timer-bar');
+    timerBar.className = ''; // Reset colors
+
     timerInterval = setInterval(() => {
         timeLeft--;
         timerDisplay.innerText = timeLeft;
+
+        // Timer Bar Math & Colors
+        const percentage = (timeLeft / testTime) * 100;
+        timerBar.style.width = `${percentage}%`;
+
+        if (timeLeft <= 20 && timeLeft > 10) {
+            timerBar.className = 'warning'; // Turns yellow
+        } else if (timeLeft <= 10) {
+            timerBar.className = 'danger'; // Turns red
+        }
+
         if (timeLeft === 0) endGame();
     }, 1000);
 }
@@ -189,6 +248,60 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // The main test typing input listener
     hiddenInput.addEventListener('input', handleInputLogic);
+
+    // --- NEW DEPLOYMENT 1 EVENT LISTENERS ---
+
+    // 1. Theme Toggle
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    if (localStorage.getItem('theme') === 'light') {
+        document.body.classList.add('light-theme');
+        themeToggleBtn.innerText = '🌙';
+    }
+    themeToggleBtn.addEventListener('click', () => {
+        document.body.classList.toggle('light-theme');
+        if (document.body.classList.contains('light-theme')) {
+            localStorage.setItem('theme', 'light');
+            themeToggleBtn.innerText = '🌙';
+        } else {
+            localStorage.setItem('theme', 'dark');
+            themeToggleBtn.innerText = '☀️';
+        }
+    });
+
+    // 2. Sound Toggle
+    const soundToggleBtn = document.getElementById('sound-toggle');
+    soundToggleBtn.addEventListener('click', () => {
+        isSoundOn = !isSoundOn;
+        soundToggleBtn.innerText = isSoundOn ? '🔊' : '🔇';
+    });
+
+    // 3. Time Selectors
+    const timeBtns = document.querySelectorAll('.time-btn');
+    timeBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            timeBtns.forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            testTime = parseInt(e.target.getAttribute('data-time'));
+            setupGame(); // Instantly restart with new time
+            document.getElementById('timer-bar').style.width = '100%';
+            document.getElementById('timer-bar').className = '';
+        });
+    });
+
+    // 4. Tab + Enter Shortcut
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Tab') {
+            isTabPressed = true;
+            e.preventDefault(); // Stops tab from highlighting random buttons
+        }
+        if (e.key === 'Enter' && isTabPressed) {
+            if (mainTestSection.style.display !== 'none') setupGame();
+        }
+    });
+    document.addEventListener('keyup', (e) => {
+        if (e.key === 'Tab') isTabPressed = false;
+    });
+
 
     // Start everything initially for the main test
     setupGame();

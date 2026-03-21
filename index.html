@@ -25,13 +25,34 @@
 
         <div id="main-test-section">
             <!-- Header & Live Stats -->
+            <!-- Header & Live Stats -->
             <header>
+                <!-- NEW: Top Controls (Theme & Sound) -->
+                <div class="top-controls">
+                    <button id="theme-toggle" title="Toggle Light/Dark Theme">☀️</button>
+                    <button id="sound-toggle" title="Toggle Sound">🔇</button>
+                </div>
+
+                <!-- NEW: Custom Timer Selectors -->
+                <div class="time-selectors">
+                    <button class="time-btn" data-time="15">15s</button>
+                    <button class="time-btn active" data-time="30">30s</button>
+                    <button class="time-btn" data-time="60">60s</button>
+                    <button class="time-btn" data-time="120">120s</button>
+                </div>
 
                 <div class="stats">
                     <p>Time: <span id="timer">30</span>s</p>
                     <p>WPM: <span id="wpm">0</span></p>
                     <button id="restart-btn">Restart</button>
                 </div>
+
+                <!-- NEW: Visual Timer Bar -->
+                <div id="timer-bar-container">
+                    <div id="timer-bar"></div>
+                </div>
+                <!-- NEW: Shortcut Hint -->
+                <p class="shortcut-hint">Shortcut: <kbd>Tab</kbd> + <kbd>Enter</kbd> to restart test</p>
             </header>
 
             <!-- The Typing Area -->
