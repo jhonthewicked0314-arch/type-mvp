@@ -3,13 +3,7 @@
 // --- 1. SUPABASE CONNECTION ---
 const supabaseUrl = 'https://kolayolotgsejhwrsbyq.supabase.co';
 const supabaseKey = 'sb_publishable_0g_gJHK8gJka59sAeJc7aw_1SQ58e0p';
-const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey, {
-    auth: {
-        persistSession: false,
-        autoRefreshToken: false,
-        detectSessionInUrl: false
-    }
-});
+
 
 // --- 2. DOM ELEMENTS ---
 // Declared globally, assigned inside DOMContentLoaded
@@ -76,6 +70,8 @@ if (!userId) {
     userId = 'user_' + Math.random().toString(36).substr(2, 9);
     localStorage.setItem('type_user_id', userId);
 }
+
+let wpmChartInstance = null; // NEW: Holds our chart so we can update it
 
 // --- 4. INITIALIZATION & RESTART LOGIC (Main Test) ---
 function setupGame() {
@@ -186,24 +182,34 @@ async function endGame() {
 
 // --- 8. DATABASE FUNCTIONS ---
 async function saveScore(wpm, accuracy) {
-    const { error } = await supabaseClient
-        .from('user_history')
-        .insert([{ user_id: userId, wpm: wpm, accuracy: accuracy }]);
-    if (error) console.error("Error saving to database:", error);
+    const response = await fetch(`${supabaseUrl}/rest/v1/user_history`, {
+        method: 'POST',
+        headers: {
+            'apikey': supabaseKey,
+            'Authorization': `Bearer ${supabaseKey}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({ user_id: userId, wpm: wpm, accuracy: accuracy })
+    });
+    if (!response.ok) console.error("Error saving to database:", await response.text());
 }
 
+// --- 8. DATABASE & CHART FUNCTIONS ---
 async function loadHistory() {
-    const { data, error } = await supabaseClient
-        .from('user_history')
-        .select('*')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false })
-        .limit(5);
+    // 1. Fetch the last 20 scores instead of 5
+    const response = await fetch(`${supabaseUrl}/rest/v1/user_history?user_id=eq.${userId}&order=created_at.desc&limit=20`, {
+        headers: {
+            'apikey': supabaseKey,
+            'Authorization': `Bearer ${supabaseKey}`
+        }
+    });
 
-    if (error) {
-        console.error("Error loading history:", error);
+    if (!response.ok) {
+        console.error("Error loading history:", await response.text());
         return;
     }
+    const data = await response.json();
 
     historyList.innerHTML = '';
     if (data.length === 0) {
@@ -211,12 +217,81 @@ async function loadHistory() {
         return;
     }
 
-    data.forEach(row => {
+    // 2. Update the Text List (We still only show the top 5 here so it doesn't get too long)
+    const recentFive = data.slice(0, 5);
+    recentFive.forEach(row => {
         const li = document.createElement('li');
         const dateString = new Date(row.created_at).toLocaleDateString();
         li.innerText = `${row.wpm} WPM | ${row.accuracy}% Acc | ${dateString}`;
         historyList.appendChild(li);
     });
+
+    // 3. Update the Chart (We use all 20 results)
+    // Supabase returns newest first. For a left-to-right chart, we must reverse the array.
+    const chartData = [...data].reverse();
+
+    // Create an array for the X-axis (e.g., "1, 2, 3...") and Y-axis (WPM scores)
+    const labels = chartData.map((row, index) => `Test ${index + 1}`);
+    const wpmValues = chartData.map(row => row.wpm);
+
+    renderChart(labels, wpmValues);
+}
+
+// NEW: Render the Chart.js Graph
+function renderChart(labels, wpmData) {
+    const ctx = document.getElementById('wpmChart').getContext('2d');
+
+    // Check if we are in light or dark mode to set the grid/text colors
+    const isLight = document.body.classList.contains('light-theme');
+    const gridColor = isLight ? '#ddd' : '#444';
+    const textColor = isLight ? '#333' : '#d1d0c5';
+
+    // If the chart already exists, just update the data (don't redraw the whole thing)
+    if (wpmChartInstance) {
+        wpmChartInstance.data.labels = labels;
+        wpmChartInstance.data.datasets[0].data = wpmData;
+
+        wpmChartInstance.options.scales.x.grid.color = gridColor;
+        wpmChartInstance.options.scales.y.grid.color = gridColor;
+        wpmChartInstance.options.scales.x.ticks.color = textColor;
+        wpmChartInstance.options.scales.y.ticks.color = textColor;
+
+        wpmChartInstance.update();
+    } else {
+        // If it doesn't exist yet, create it!
+        wpmChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'WPM',
+                    data: wpmData,
+                    borderColor: '#e2b714', // Our accent yellow
+                    backgroundColor: 'rgba(226, 183, 20, 0.2)', // Faded yellow fill
+                    borderWidth: 2,
+                    tension: 0.3, // Makes the line curved instead of jagged
+                    fill: true,
+                    pointBackgroundColor: '#e2b714'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } }, // Hides the top label
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: gridColor },
+                        ticks: { color: textColor }
+                    },
+                    x: {
+                        grid: { color: gridColor },
+                        ticks: { color: textColor }
+                    }
+                }
+            }
+        });
+    }
 }
 
 
@@ -266,6 +341,8 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('theme', 'dark');
             themeToggleBtn.innerText = '☀️';
         }
+        // NEW: Update chart colors when theme changes
+        if (wpmChartInstance) loadHistory();
     });
 
     // 2. Sound Toggle

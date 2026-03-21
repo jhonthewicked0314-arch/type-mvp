@@ -6,8 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Type MVP</title>
     <link rel="stylesheet" href="style.css">
-    <!-- This brings Supabase into our project for later -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- NEW: Chart.js for the WPM Graph -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -64,9 +65,16 @@
             </div>
 
             <!-- History Area (For Supabase later) -->
+            <!-- History Area (For Supabase later) -->
             <div id="history-section">
                 <h3>Your History</h3>
                 <p id="user-tag">User ID: Generating...</p>
+
+                <!-- NEW: WPM Chart Canvas -->
+                <div class="chart-container" style="position: relative; height:200px; width:100%; margin-bottom: 20px;">
+                    <canvas id="wpmChart"></canvas>
+                </div>
+
                 <ul id="history-list">
                     <li>No history yet. Take a test!</li>
                 </ul>
