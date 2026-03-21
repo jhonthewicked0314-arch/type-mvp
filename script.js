@@ -85,10 +85,17 @@ const ACHIEVEMENTS = [
     { id: 'night_owl', title: 'Night Owl', desc: 'Type in dark mode.' },
     { id: 'flash', title: 'The Flash', desc: 'Reach 100+ WPM.' }
 ];
+let lastCompletedTestErrors = {}; // NEW: Remembers your last test even if you click away
+let previousInputLength = 0; // NEW: Helps us stop duplicate counting
+
 
 // --- 4. INITIALIZATION & RESTART LOGIC (Main Test) ---
 function setupGame() {
-    currentTestErrors = {}; // Reset error tracking for the new test
+    clearInterval(timerInterval);
+    timeLeft = testTime;
+    isPlaying = false;
+    currentTestErrors = {};
+    previousInputLength = 0;
 
     clearInterval(timerInterval);
     timeLeft = testTime;
@@ -124,9 +131,31 @@ function handleInputLogic() {
 
     const spans = wordsDisplay.querySelectorAll('span');
     const typedArray = hiddenInput.value.split('');
+    const currentLength = typedArray.length;
 
+    // NEW: ACCURATE ERROR TRACKING & SOUNDS
+    // Only count if they typed a new character (ignores backspace)
+    if (currentLength > previousInputLength) {
+        const currentIndex = currentLength - 1;
+        const typedChar = typedArray[currentIndex];
+        const expectedChar = spans[currentIndex]?.innerText;
+
+        if (typedChar !== expectedChar && expectedChar) {
+            // It's a mistake! Count it exactly ONCE.
+            const lowerExpected = expectedChar.toLowerCase();
+            if (lowerExpected.match(/[a-z]/)) {
+                currentTestErrors[lowerExpected] = (currentTestErrors[lowerExpected] || 0) + 1;
+            }
+            if (typeof playError === 'function') playError();
+        } else {
+            // It's correct!
+            if (typeof playClick === 'function') playClick();
+        }
+    }
+    previousInputLength = currentLength; // Update the tracker
+
+    // VISUAL COLOR UPDATE (This stays in the loop)
     let correctCount = 0;
-
     spans.forEach((span, index) => {
         const typedChar = typedArray[index];
         if (typedChar == null) {
@@ -135,24 +164,14 @@ function handleInputLogic() {
             span.classList.add('correct');
             span.classList.remove('incorrect');
             correctCount++;
-            if (index === typedArray.length - 1) playClick();
         } else {
             span.classList.add('incorrect');
             span.classList.remove('correct');
-
-            // NEW: Track the specific letter they missed (only letters a-z)
-            const expectedChar = span.innerText.toLowerCase();
-            if (expectedChar.match(/[a-z]/)) {
-                currentTestErrors[expectedChar] = (currentTestErrors[expectedChar] || 0) + 1;
-            }
-
-            if (typedArray.length > document.querySelectorAll('.correct, .incorrect').length - 1) playError();
         }
     });
 
     if (typedArray.length === spans.length) endGame();
 }
-
 // --- 6. THE TIMER LOGIC (Main Test) ---
 // --- 6. THE TIMER LOGIC (Main Test) ---
 function startTimer() {
@@ -220,7 +239,10 @@ async function endGame() {
 
     // 4. Reload UI
     await loadHistory();
-    await loadAwardsAndHeatmap(); // We will create this function next
+    // Save a permanent backup of this test's errors before generating the heatmap
+    lastCompletedTestErrors = { ...currentTestErrors };
+    await loadAwardsAndHeatmap(lastCompletedTestErrors);
+
 }
 
 // --- 8. DATABASE FUNCTIONS ---
@@ -279,18 +301,35 @@ async function checkAchievements(wpm, accuracy) {
         });
     }
 }
+// 1. Map every key to a specific human finger
+const FINGER_MAP = {
+    'q': 'Left Pinky', 'a': 'Left Pinky', 'z': 'Left Pinky',
+    'w': 'Left Ring', 's': 'Left Ring', 'x': 'Left Ring',
+    'e': 'Left Middle', 'd': 'Left Middle', 'c': 'Left Middle',
+    'r': 'Left Index', 'f': 'Left Index', 'v': 'Left Index', 't': 'Left Index', 'g': 'Left Index', 'b': 'Left Index',
+    'y': 'Right Index', 'h': 'Right Index', 'n': 'Right Index', 'u': 'Right Index', 'j': 'Right Index', 'm': 'Right Index',
+    'i': 'Right Middle', 'k': 'Right Middle',
+    'o': 'Right Ring', 'l': 'Right Ring',
+    'p': 'Right Pinky'
+};
 
-async function loadAwardsAndHeatmap() {
-    // 1. Load Achievements
-    let achData = null;
+// 2. Map fingers to your specific Lessons from lessons.js
+const FINGER_LESSON_MAP = {
+    'Left Pinky': 1, 'Left Ring': 1, 'Left Middle': 1, 'Left Index': 1, // Lesson 1: ASDF
+    'Right Index': 2, 'Right Middle': 2, 'Right Ring': 2, 'Right Pinky': 2 // Lesson 2: JKL;
+};
+// Add 'lastTestErrors' as an argument here!
+async function loadAwardsAndHeatmap(lastTestErrors = {}) {
+    // 1. Load Achievements (Antigravity's fetch code is fine here!)
     try {
-        const achRes = await fetch(`${supabaseUrl}/rest/v1/user_achievements?select=achievement_id&user_id=eq.${userId}`, {
+        const response = await fetch(`https://kolayolotgsejhwrsbyq.supabase.co/rest/v1/user_achievements?select=achievement_id&user_id=eq.${userId}`, {
             headers: { 'apikey': supabaseKey, 'Authorization': `Bearer ${supabaseKey}` }
         });
-        if (achRes.ok) achData = await achRes.json();
-    } catch(e) { console.error(e); }
-
-    if (achData) unlockedAchievementIds = achData.map(a => a.achievement_id);
+        const achData = await response.json();
+        if (achData && achData.length > 0) {
+            unlockedAchievementIds = achData.map(a => a.achievement_id);
+        }
+    } catch (e) { console.error("Achievement load error", e); }
 
     const grid = document.getElementById('achievements-grid');
     grid.innerHTML = '';
@@ -304,38 +343,79 @@ async function loadAwardsAndHeatmap() {
         `;
     });
 
-    // 2. Load Heatmap Data
-    let heatData = null;
-    try {
-        const heatRes = await fetch(`${supabaseUrl}/rest/v1/user_heatmap?select=missed_keys&user_id=eq.${userId}`, {
-            headers: { 'apikey': supabaseKey, 'Authorization': `Bearer ${supabaseKey}` }
-        });
-        if (heatRes.ok) heatData = await heatRes.json();
-    } catch(e) { console.error(e); }
+    // 2. HEATMAP MATH (Using local memory, completely bypasses database errors!)
+    let fingerErrors = {
+        'Left Pinky': 0, 'Left Ring': 0, 'Left Middle': 0, 'Left Index': 0,
+        'Right Index': 0, 'Right Middle': 0, 'Right Ring': 0, 'Right Pinky': 0
+    };
 
-    // Tally all historical errors
-    let totalErrors = {};
-    if (heatData) {
-        heatData.forEach(row => {
-            for (const [key, count] of Object.entries(row.missed_keys)) {
-                totalErrors[key] = (totalErrors[key] || 0) + count;
-            }
-        });
+    let totalMistakesInLastTest = 0;
+
+    // Safely parse the memory object
+    if (typeof lastTestErrors === 'string') lastTestErrors = JSON.parse(lastTestErrors);
+
+    for (const [key, count] of Object.entries(lastTestErrors)) {
+        totalMistakesInLastTest += parseInt(count); // Force it to be a number
+        if (FINGER_MAP[key]) {
+            fingerErrors[FINGER_MAP[key]] += parseInt(count);
+        }
     }
 
-    // Render A-Z Keyboard
+    // 3. Render A-Z Keyboard
     const kbContainer = document.getElementById('keyboard-heatmap');
     kbContainer.innerHTML = '';
     const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
 
     alphabet.forEach(letter => {
-        const errCount = totalErrors[letter] || 0;
-        let colorClass = 'good'; // Default green
-        if (errCount > 10) colorClass = 'danger'; // Red
-        else if (errCount > 3) colorClass = 'warning'; // Yellow
+        const errCount = lastTestErrors[letter] || 0;
+        let colorClass = 'good';
+        if (errCount >= 3) colorClass = 'danger';
+        else if (errCount >= 1) colorClass = 'warning';
 
-        kbContainer.innerHTML += `<div class="key-box ${colorClass}" title="${errCount} mistakes">${letter}</div>`;
+        kbContainer.innerHTML += `<div class="key-box ${colorClass}" title="Missed ${errCount} times in last test">${letter}</div>`;
     });
+
+    // 4. Biomechanics Analysis Engine
+    const diagnosticPanel = document.getElementById('diagnostic-panel');
+    const perfectPanel = document.getElementById('perfect-test-panel');
+
+    let weakestFinger = "Left Index"; // Safe default so it NEVER says 'null'
+    let maxErrors = 0;
+
+    for (const [finger, errors] of Object.entries(fingerErrors)) {
+        if (errors > maxErrors) {
+            maxErrors = errors;
+            weakestFinger = finger;
+        }
+    }
+
+    // Toggle Panels based on performance
+    if (totalMistakesInLastTest === 0) {
+        diagnosticPanel.style.display = 'none';
+        perfectPanel.style.display = 'block';
+    } else {
+        perfectPanel.style.display = 'none';
+        diagnosticPanel.style.display = 'block';
+
+        document.getElementById('weakest-finger-name').innerText = weakestFinger;
+        document.getElementById('weakest-finger-stats').innerText = `You missed keys with your ${weakestFinger} ${maxErrors} times in the last test.`;
+
+        const recommendedLessonId = FINGER_LESSON_MAP[weakestFinger] || 1;
+        const btn = document.getElementById('recommended-lesson-btn');
+
+        // Clone button to reset clicks
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+
+        newBtn.innerText = `Practice ${weakestFinger} (Lesson ${recommendedLessonId})`;
+        newBtn.addEventListener('click', () => {
+            document.getElementById('awards-section').style.display = 'none';
+            document.getElementById('lessons-section').style.display = 'block';
+            document.getElementById('lessons-menu-display').style.display = 'none';
+
+            if (typeof startLesson === 'function') startLesson(recommendedLessonId);
+        });
+    }
 }
 // --- 8. DATABASE & CHART FUNCTIONS ---
 async function loadHistory() {
@@ -532,7 +612,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (typeof lessonsSection !== 'undefined') lessonsSection.style.display = 'none';
         awardsSection.style.display = 'block';
 
-        loadAwardsAndHeatmap(); // Load data from Supabase when clicked!
+        // Pass the backup memory here! Now it won't disappear!
+        loadAwardsAndHeatmap(lastCompletedTestErrors);
     });
 
     // *Important:* Go to your navMainTest click listener and add:

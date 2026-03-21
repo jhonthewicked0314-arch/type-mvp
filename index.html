@@ -121,11 +121,27 @@
 
             <div class="stats-grid">
                 <!-- Heatmap -->
+                <!-- Post-Match Analysis -->
                 <div class="heatmap-card">
-                    <h3>Key Error Heatmap</h3>
-                    <p class="heatmap-desc">Keys you miss the most across all tests.</p>
+                    <h3>Last Test Analysis</h3>
+                    <p class="heatmap-desc">Mistakes made in your <strong>most recent test</strong>.</p>
+
                     <div id="keyboard-heatmap">
                         <!-- JS will generate A-Z keys here -->
+                    </div>
+
+                    <!-- Biomechanical Diagnostic Panel -->
+                    <div id="diagnostic-panel" style="display: none;">
+                        <h4>Action Report</h4>
+                        <p>Most Missed Finger: <strong id="weakest-finger-name">N/A</strong></p>
+                        <p id="weakest-finger-stats">You missed keys with this finger 0 times.</p>
+                        <button id="recommended-lesson-btn">Practice This Finger</button>
+                    </div>
+
+                    <!-- Perfect Test Message -->
+                    <div id="perfect-test-panel"
+                        style="display: none; margin-top: 20px; color: #4CAF50; font-weight: bold;">
+                        🌟 Flawless! 0 mistakes on your last test.
                     </div>
                 </div>
 
