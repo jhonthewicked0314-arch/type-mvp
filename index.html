@@ -10,7 +10,17 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
+
+    <!-- ▼ HERO BANNER: fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap"
+        rel="stylesheet">
+
     <link rel="stylesheet" href="style.css">
+
+    <!-- ▼ HERO BANNER: styles (scoped, won't affect style.css) -->
+    <link rel="stylesheet" href="hero.css">
 
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -47,6 +57,175 @@
         </div>
     </header>
 
+    <!-- ════════════════════════════════════════════════════
+         ▼ HERO BANNER — inserted between header and main
+           All class names prefixed with hb- to avoid any
+           clash with style.css.  IDs prefixed with hb too.
+    ═════════════════════════════════════════════════════ -->
+    <section class="hero">
+
+        <!-- LEFT: copy & CTAs -->
+        <div class="hb-left">
+
+            <div class="hb-badge">
+                <span class="hb-badge-dot"></span>
+                Intelligent Feedback
+            </div>
+
+            <h2 class="hb-heading">
+                Master typing with<br>
+                <em>precision</em> and clarity.
+            </h2>
+
+            <p class="hb-subtext">
+                Understand your speed, improve accuracy, and build real typing confidence
+                with intelligent, session-aware feedback.
+            </p>
+
+            <div class="hb-type-preview-wrap">
+                <div class="hb-type-label">
+                    <span class="hb-type-label-dot"></span>
+                    Live session
+                </div>
+                <div class="hb-type-preview" id="hbTypePreview">
+                    <span class="hb-cursor" id="hbCursor"></span>
+                </div>
+            </div>
+
+            <div class="hb-actions">
+                <a href="#practice-workspace" class="hb-btn-primary">
+                    Start Typing
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        <path d="M2.5 7H11.5M8 3.5L11.5 7L8 10.5" stroke="white" stroke-width="1.6"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </a>
+                <a href="#" id="nav-awards-hero" class="hb-btn-secondary">View Analysis</a>
+            </div>
+
+            <div class="hb-stats">
+                <div class="hb-stat-item">
+                    <span class="hb-stat-val">142<small> WPM</small></span>
+                    <span class="hb-stat-label">Peak speed recorded</span>
+                </div>
+                <div class="hb-stat-item">
+                    <span class="hb-stat-val">99.1<small> %</small></span>
+                    <span class="hb-stat-label">Top accuracy score</span>
+                </div>
+                <div class="hb-stat-item">
+                    <span class="hb-stat-val">40k<small> +</small></span>
+                    <span class="hb-stat-label">Active typists</span>
+                </div>
+            </div>
+
+        </div><!-- /hb-left -->
+
+        <!-- RIGHT: animated keyboard -->
+        <div class="hb-right" id="hbRightPanel">
+
+            <!-- ambient floating div-key shapes -->
+            <div class="hb-ambient-layer" id="hbAmbientLayer"></div>
+
+            <!-- SVG ambient elements -->
+            <div class="hb-svg-ambient-layer" id="hbSvgAmbientLayer"></div>
+
+            <div class="hb-keyboard-scene">
+                <div class="hb-keyboard-wrap" id="hbKbWrap">
+                    <div class="hb-keyboard">
+
+                        <div class="hb-light-sweep"></div>
+
+                        <!-- Row 0: Numbers -->
+                        <div class="hb-key-row">
+                            <div class="hb-key hb-key-fn" data-char="`">`</div>
+                            <div class="hb-key" data-char="1">1</div>
+                            <div class="hb-key" data-char="2">2</div>
+                            <div class="hb-key" data-char="3">3</div>
+                            <div class="hb-key" data-char="4">4</div>
+                            <div class="hb-key" data-char="5">5</div>
+                            <div class="hb-key" data-char="6">6</div>
+                            <div class="hb-key" data-char="7">7</div>
+                            <div class="hb-key" data-char="8">8</div>
+                            <div class="hb-key" data-char="9">9</div>
+                            <div class="hb-key" data-char="0">0</div>
+                            <div class="hb-key" data-char="-">−</div>
+                            <div class="hb-key" data-char="=">=</div>
+                            <div class="hb-key hb-key-backsp" data-char="">⌫</div>
+                        </div>
+
+                        <!-- Row 1: QWERTY -->
+                        <div class="hb-key-row">
+                            <div class="hb-key hb-key-tab" data-char="  ">Tab</div>
+                            <div class="hb-key" data-char="q">Q</div>
+                            <div class="hb-key" data-char="w">W</div>
+                            <div class="hb-key" data-char="e">E</div>
+                            <div class="hb-key" data-char="r">R</div>
+                            <div class="hb-key" data-char="t">T</div>
+                            <div class="hb-key" data-char="y">Y</div>
+                            <div class="hb-key" data-char="u">U</div>
+                            <div class="hb-key" data-char="i">I</div>
+                            <div class="hb-key" data-char="o">O</div>
+                            <div class="hb-key" data-char="p">P</div>
+                            <div class="hb-key" data-char="[">[</div>
+                            <div class="hb-key" data-char="]">]</div>
+                            <div class="hb-key hb-key-backsp" data-char="">\</div>
+                        </div>
+
+                        <!-- Row 2: ASDF -->
+                        <div class="hb-key-row">
+                            <div class="hb-key hb-key-caps" data-char="">Caps</div>
+                            <div class="hb-key" data-char="a">A</div>
+                            <div class="hb-key" data-char="s">S</div>
+                            <div class="hb-key" data-char="d">D</div>
+                            <div class="hb-key" data-char="f">F</div>
+                            <div class="hb-key" data-char="g">G</div>
+                            <div class="hb-key" data-char="h">H</div>
+                            <div class="hb-key" data-char="j">J</div>
+                            <div class="hb-key" data-char="k">K</div>
+                            <div class="hb-key" data-char="l">L</div>
+                            <div class="hb-key" data-char=";">;</div>
+                            <div class="hb-key" data-char="'">'</div>
+                            <div class="hb-key hb-key-enter" data-char="↵">↵</div>
+                        </div>
+
+                        <!-- Row 3: ZXCV -->
+                        <div class="hb-key-row">
+                            <div class="hb-key hb-key-shift-l" data-char="">⇧ Shift</div>
+                            <div class="hb-key" data-char="z">Z</div>
+                            <div class="hb-key" data-char="x">X</div>
+                            <div class="hb-key" data-char="c">C</div>
+                            <div class="hb-key" data-char="v">V</div>
+                            <div class="hb-key" data-char="b">B</div>
+                            <div class="hb-key" data-char="n">N</div>
+                            <div class="hb-key" data-char="m">M</div>
+                            <div class="hb-key" data-char=",">,</div>
+                            <div class="hb-key" data-char=".">.</div>
+                            <div class="hb-key" data-char="/">/</div>
+                            <div class="hb-key hb-key-shift-r" data-char="">Shift ⇧</div>
+                        </div>
+
+                        <!-- Row 4: Bottom -->
+                        <div class="hb-key-row">
+                            <div class="hb-key hb-key-ctrl" data-char="">Ctrl</div>
+                            <div class="hb-key hb-key-meta" data-char="">⌘</div>
+                            <div class="hb-key hb-key-alt" data-char="">Alt</div>
+                            <div class="hb-key hb-key-space" data-char=" "></div>
+                            <div class="hb-key hb-key-alt" data-char="">Alt</div>
+                            <div class="hb-key hb-key-meta" data-char="">⌘</div>
+                            <div class="hb-key hb-key-fn" data-char="">≡</div>
+                            <div class="hb-key hb-key-ctrl" data-char="">Ctrl</div>
+                        </div>
+
+                    </div><!-- /hb-keyboard -->
+                </div><!-- /hb-keyboard-wrap -->
+            </div><!-- /hb-keyboard-scene -->
+
+        </div><!-- /hb-right -->
+
+    </section>
+    <!-- ▲ END HERO BANNER ══════════════════════════════════ -->
+
+
     <!-- MAIN WRAPPER -->
     <main class="content-wrapper">
 
@@ -54,25 +233,6 @@
              PAGE 1: MAIN TEST & HOMEPAGE CONTENT
         =========================================== -->
         <div id="main-test-section" class="page-section fade-in">
-
-            <!-- HERO BANNER -->
-            <section class="hero-section">
-                <div class="hero-content">
-                    <span class="badge-label">Trusted by Professionals</span>
-                    <h2 class="hero-title">Elevate Your Typing Speed to Professional Standards.</h2>
-                    <p class="hero-subtitle">Stop looking at your keyboard. Develop flawless muscle memory with our
-                        biomechanical analysis engine and tailored curriculums.</p>
-                    <div class="hero-buttons">
-                        <a href="#practice-workspace" class="btn-primary large">Take the Benchmark Test</a>
-                        <a href="#" class="btn-text dummy-link">View Typing Standards →</a>
-                    </div>
-                </div>
-                <div class="hero-visual">
-                    <!-- Placeholder for a 3D Keyboard/Illustration -->
-                    <img src="https://images.unsplash.com/photo-1595225476474-87563907a212?q=80&w=2071&auto=format&fit=crop"
-                        alt="Mechanical Keyboard" class="floating-img">
-                </div>
-            </section>
 
             <!-- THE CORE APP WORKSPACE -->
             <section id="practice-workspace" class="app-workspace">
@@ -167,7 +327,7 @@
             <!-- DUMMY CONTENT: ERGONOMICS -->
             <section id="ergonomics-section" class="info-section split-section">
                 <div class="split-text">
-                    <h2>Ergonomics & Posture</h2>
+                    <h2>Ergonomics &amp; Posture</h2>
                     <p>Typing fast isn't just about your fingers; it's about your whole body. Prevent strain and
                         increase endurance with proper form.</p>
                     <ul class="check-list">
@@ -282,7 +442,7 @@
 
                 <!-- Achievements -->
                 <div class="achievements-card app-card shadow-sm">
-                    <h3>Milestones & Certifications</h3>
+                    <h3>Milestones &amp; Certifications</h3>
                     <p class="text-muted mb-20">Unlock professional benchmarks as you progress.</p>
                     <div id="achievements-grid">
                         <!-- JS generates badges here -->
@@ -340,6 +500,10 @@
     <!-- Scripts -->
     <script src="script.js"></script>
     <script src="lessons.js"></script>
+
+    <!-- ▼ HERO BANNER: behaviour (isolated IIFE, no globals) -->
+    <script src="hero.js"></script>
+
 </body>
 
 </html>
