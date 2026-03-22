@@ -971,3 +971,906 @@ kbd {
         transform: translateY(20px);
     }
 }
+
+/* --- CLICK TO FOCUS OVERLAY --- */
+.typing-overlay {
+    position: absolute;
+    inset: 0;
+    /* Covers the whole container */
+    background: rgba(244, 243, 240, 0.6);
+    /* Adjust to match your background */
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    cursor: pointer;
+    transition: opacity 0.2s ease-out, visibility 0.2s;
+}
+
+body.light-theme .typing-overlay {
+    background: rgba(26, 25, 23, 0.7);
+    /* Dark theme blur */
+}
+
+.overlay-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface);
+    color: var(--text-pri);
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-weight: 500;
+    font-family: var(--font-ui);
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--card-border);
+    transition: transform 0.2s;
+}
+
+.typing-overlay:hover .overlay-content {
+    transform: scale(1.05);
+    color: var(--accent);
+}
+
+/* This class hides the overlay when active */
+.typing-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* =========================================================
+   PRACTICE WORKSPACE - SOFT 3D / CLAYMORPHISM
+========================================================= */
+.soft-aesthetic {
+    position: relative;
+    padding: 80px 20px;
+    background: linear-gradient(135deg, #e9eff5 0%, #d8e3eb 100%);
+    border-radius: 30px;
+    overflow: hidden;
+    font-family: 'DM Sans', 'Inter', sans-serif;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* ==========================================
+   TOP CONTROLS (Pill & Icons)
+=========================================== */
+.soft-top-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 30px;
+    z-index: 10;
+}
+
+.dummy-icon {
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    color: #8e9bad;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.dummy-icon:hover {
+    color: #5a6b82;
+}
+
+.soft-time-pill {
+    display: flex;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 30px;
+    padding: 4px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02), 0 2px 10px rgba(0, 0, 0, 0.02);
+}
+
+.soft-time-pill .time-btn {
+    background: transparent;
+    border: none;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-weight: 500;
+    color: #8e9bad;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.soft-time-pill .time-btn.active {
+    background: linear-gradient(135deg, #c4f1e5, #a3ebd5);
+    color: #2b5c50;
+    box-shadow: 0 4px 10px rgba(163, 235, 213, 0.4);
+}
+
+/* ==========================================
+   MAIN TYPING CARD
+=========================================== */
+.soft-app-card {
+    background: #ffffff;
+    width: 100%;
+    max-width: 750px;
+    border-radius: 24px;
+    padding: 50px;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.04), 0 4px 15px rgba(0, 0, 0, 0.02);
+    z-index: 10;
+    position: relative;
+}
+
+.soft-typing-container {
+    position: relative;
+    min-height: 120px;
+}
+
+#typing-area {
+    font-size: 1.6rem;
+    line-height: 1.8;
+    color: #2d3748;
+    font-weight: 400;
+}
+
+/* Custom Text Colors matching image */
+#words-display span {
+    transition: color 0.1s;
+}
+
+#words-display span.correct {
+    color: #2d3748;
+    font-weight: 500;
+}
+
+#words-display span.incorrect {
+    color: #e57373;
+    border-bottom: 2px solid rgba(229, 115, 115, 0.4);
+}
+
+#words-display span:not(.correct):not(.incorrect) {
+    color: #a0aec0;
+}
+
+/* Future text */
+
+/* THE CUSTOM BLUE CURSOR (Pure CSS Magic) */
+#words-display span.correct+span:not(.correct):not(.incorrect),
+#words-display span.incorrect+span:not(.correct):not(.incorrect),
+#words-display span:not(.correct):not(.incorrect):first-child {
+    border-left: 3px solid #89badd;
+    margin-left: -3px;
+    border-radius: 2px;
+    animation: smoothBlink 1s infinite;
+}
+
+@keyframes smoothBlink {
+
+    0%,
+    100% {
+        border-color: #89badd;
+    }
+
+    50% {
+        border-color: transparent;
+    }
+}
+
+#hidden-input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* ==========================================
+   SLIDER PROGRESS BAR
+=========================================== */
+.soft-slider-track {
+    width: 100%;
+    height: 8px;
+    background: #eef2f6;
+    border-radius: 10px;
+    margin-top: 40px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+    position: relative;
+}
+
+.soft-slider-fill {
+    height: 100%;
+    width: 100%;
+    /* JS will shrink this */
+    background: linear-gradient(90deg, #9bbde8, #a3ebd5);
+    border-radius: 10px;
+    position: relative;
+    transition: width 1s linear;
+}
+
+/* The Thumb at the end of the slider */
+.slider-thumb {
+    position: absolute;
+    right: -6px;
+    top: -4px;
+    width: 16px;
+    height: 16px;
+    background: #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15), inset 0 -2px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* ==========================================
+   OVERLAY (Click to Focus)
+=========================================== */
+.typing-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.typing-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.overlay-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: white;
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-weight: 500;
+    color: #4a6cf7;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s;
+}
+
+.typing-overlay:hover .overlay-content {
+    transform: scale(1.05);
+}
+
+/* ==========================================
+   LIVE STATS & HISTORY (Below Card)
+=========================================== */
+.soft-footer-stats {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 10;
+}
+
+.live-stats {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.stat-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #8e9bad;
+}
+
+.stat-value {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #2d3748;
+}
+
+#restart-btn {
+    background: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    color: #8e9bad;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+#restart-btn:hover {
+    color: #4a6cf7;
+    transform: rotate(180deg);
+}
+
+.shortcut-hint {
+    font-size: 0.8rem;
+    color: #a0aec0;
+    margin-top: 15px;
+}
+
+.shortcut-hint kbd {
+    background: rgba(255, 255, 255, 0.5);
+    padding: 2px 6px;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.soft-history-card {
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+    width: 100%;
+    max-width: 750px;
+    border-radius: 20px;
+    padding: 30px;
+    margin-top: 40px;
+    z-index: 10;
+}
+
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.history-header h3 {
+    margin: 0;
+    color: #2d3748;
+}
+
+.clean-list li {
+    background: white;
+    padding: 12px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+}
+
+/* =========================================================
+   THE 3D FLOATING ELEMENTS (Pure CSS Recreations!)
+========================================================= */
+.float-element {
+    position: absolute;
+    z-index: 5;
+    pointer-events: none;
+}
+
+/* Base 3D Key Styling */
+.float-key {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-weight: 700;
+    font-family: 'DM Sans', sans-serif;
+    border-radius: 12px;
+}
+
+/* 1. Orange ENTER Key (Top Left) */
+.key-enter {
+    width: 80px;
+    height: 90px;
+    top: 5%;
+    left: 10%;
+    background-color: #f3a895;
+    /* Coral */
+    color: #ba604c;
+    font-size: 0.8rem;
+    line-height: 1.2;
+    transform: rotate(-15deg);
+    /* The 3D magic */
+    box-shadow:
+        inset -2px -4px 6px rgba(0, 0, 0, 0.1),
+        inset 2px 4px 6px rgba(255, 255, 255, 0.5),
+        4px 8px 0px #d98875,
+        /* 3D Edge */
+        10px 20px 30px rgba(217, 136, 117, 0.3);
+    /* Drop shadow */
+    animation: floatSlow 6s ease-in-out infinite;
+}
+
+/* 2. Green SHIFT Key (Left middle) */
+.key-shift {
+    width: 90px;
+    height: 45px;
+    top: 45%;
+    left: 5%;
+    background-color: #bde4cd;
+    /* Mint */
+    color: #5c9e7e;
+    font-size: 0.85rem;
+    transform: rotate(10deg);
+    box-shadow:
+        inset -2px -4px 6px rgba(0, 0, 0, 0.1), inset 2px 4px 6px rgba(255, 255, 255, 0.5),
+        3px 6px 0px #9dcbb4, 8px 15px 25px rgba(157, 203, 180, 0.3);
+    animation: floatSlow 5s ease-in-out infinite reverse;
+}
+
+/* 3. Blue SPACE Key (Bottom Right) */
+.key-space {
+    width: 45px;
+    height: 160px;
+    bottom: -5%;
+    right: 12%;
+    background-color: #a7c8e6;
+    /* Soft Blue */
+    color: #5880a8;
+    font-size: 0.8rem;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: rotate(20deg);
+    box-shadow:
+        inset -2px -4px 6px rgba(0, 0, 0, 0.1), inset 2px 4px 6px rgba(255, 255, 255, 0.5),
+        4px 6px 0px #8eb0cf, 10px 20px 30px rgba(142, 176, 207, 0.3);
+    animation: floatSlow 7s ease-in-out infinite;
+}
+
+/* 4. Purple C Key (Top Left background) */
+.key-c {
+    width: 40px;
+    height: 40px;
+    top: 10%;
+    left: 22%;
+    background-color: #c9bcf0;
+    color: #7f6db0;
+    font-size: 1rem;
+    border-radius: 8px;
+    transform: rotate(15deg);
+    box-shadow: inset -2px -4px 6px rgba(0, 0, 0, 0.1), inset 2px 4px 6px rgba(255, 255, 255, 0.5), 2px 4px 0px #b1a2d6;
+}
+
+/* 5. Purple Arrow Key (Bottom right background) */
+.key-arrow {
+    width: 45px;
+    height: 45px;
+    bottom: 2%;
+    right: 25%;
+    background-color: #c9bcf0;
+    color: #7f6db0;
+    font-size: 1.2rem;
+    border-radius: 10px;
+    transform: rotate(-10deg);
+    box-shadow: inset -2px -4px 6px rgba(0, 0, 0, 0.1), inset 2px 4px 6px rgba(255, 255, 255, 0.5), 2px 5px 0px #b1a2d6, 5px 10px 15px rgba(177, 162, 214, 0.3);
+}
+
+/* Decorative Dummy Icons (Rings & Scribbles) */
+.decor-icon {
+    font-size: 1.5rem;
+    color: #9bbad6;
+    opacity: 0.6;
+}
+
+.icon-mouse {
+    top: 40%;
+    right: 8%;
+    transform: rotate(-20deg);
+}
+
+.icon-align {
+    top: 50%;
+    right: 5%;
+    font-size: 2rem;
+}
+
+.icon-arrows-bot {
+    bottom: 15%;
+    right: 6%;
+}
+
+.decor-ring {
+    color: #9bbad6;
+    opacity: 0.5;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.ring-1 {
+    top: 30%;
+    left: 8%;
+}
+
+.ring-2 {
+    top: 50%;
+    left: 12%;
+}
+
+/* Soft Floating Animation */
+@keyframes floatSlow {
+    0% {
+        transform: translateY(0px) rotate(var(--rot, 0deg));
+    }
+
+    50% {
+        transform: translateY(-15px) rotate(var(--rot, 0deg));
+    }
+
+    100% {
+        transform: translateY(0px) rotate(var(--rot, 0deg));
+    }
+}
+
+.key-enter {
+    --rot: -15deg;
+}
+
+.key-shift {
+    --rot: 10deg;
+}
+
+.key-space {
+    --rot: 20deg;
+}
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+    .float-key {
+        display: none;
+    }
+
+    /* Hide 3D keys on mobile so they don't block text */
+    .soft-app-card {
+        padding: 30px;
+    }
+}
+
+/* ============================================
+   BENCHMARK SECTION — benchmark-section.css
+   Scoped under .wpm-section to avoid conflicts
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap');
+
+/* ── Section wrapper ── */
+.wpm-section {
+    font-family: 'Sora', sans-serif;
+    padding: 72px 40px;
+    background: #eef0f5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 48px;
+    box-sizing: border-box;
+}
+
+/* ── Header ── */
+.wpm-section__header {
+    text-align: center;
+    max-width: 560px;
+}
+
+.wpm-section__title {
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 800;
+    color: #1a1d2e;
+    margin: 0 0 12px 0;
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+}
+
+.wpm-section__subtitle {
+    font-size: 1rem;
+    font-weight: 400;
+    color: #6b7280;
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* ── Grid ── */
+.wpm-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    width: 100%;
+    max-width: 1100px;
+}
+
+/* ── Base card ── */
+.wpm-card {
+    border-radius: 24px;
+    padding: 28px 24px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+    box-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.06),
+        0 12px 32px rgba(0, 0, 0, 0.06);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    box-sizing: border-box;
+}
+
+.wpm-card:hover {
+    transform: translateY(-6px);
+    box-shadow:
+        0 4px 16px rgba(0, 0, 0, 0.08),
+        0 20px 48px rgba(0, 0, 0, 0.10);
+}
+
+/* subtle inner shine */
+.wpm-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 24px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.45) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+/* ── Card colour themes ── */
+.wpm-card--blue {
+    background: linear-gradient(145deg, #c2e8f8 0%, #a8dcf0 50%, #bde6f5 100%);
+}
+
+.wpm-card--mint {
+    background: linear-gradient(145deg, #bdf2d8 0%, #a4ecc8 50%, #b8f0d4 100%);
+}
+
+.wpm-card--yellow {
+    background: linear-gradient(145deg, #f5e9b0 0%, #eedfa0 50%, #f2e8b8 100%);
+}
+
+.wpm-card--pink {
+    background: linear-gradient(145deg, #f0c8e0 0%, #e4b8d8 50%, #dcc8f0 100%);
+}
+
+/* ── Icon container ── */
+.wpm-card__icon {
+    width: 76px;
+    height: 76px;
+    margin-bottom: 12px;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.12));
+    flex-shrink: 0;
+}
+
+.wpm-card__icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* ── Big WPM number ── */
+.wpm-card__speed {
+    font-size: clamp(2.4rem, 4vw, 3.2rem);
+    font-weight: 800;
+    color: #1a1d2e;
+    line-height: 1;
+    letter-spacing: -1px;
+    margin-top: 4px;
+}
+
+.wpm-card__speed span {
+    display: block;
+    font-size: 0.95em;
+    font-weight: 800;
+    color: #1a1d2e;
+    letter-spacing: -0.5px;
+    margin-top: 2px;
+}
+
+/* ── Label ── */
+.wpm-card__label {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #1a1d2e;
+    margin: 12px 0 4px 0;
+    letter-spacing: 0;
+}
+
+/* ── Description ── */
+.wpm-card__desc {
+    font-size: 0.875rem;
+    font-weight: 400;
+    color: #3a3d4e;
+    line-height: 1.55;
+    margin: 0;
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+    .wpm-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 520px) {
+    .wpm-section {
+        padding: 48px 20px;
+    }
+
+    .wpm-grid {
+        grid-template-columns: 1fr;
+        max-width: 360px;
+    }
+}
+
+/* ============================================
+   ERGONOMICS SECTION — ergonomics-section.css
+   Fully scoped — won't touch other page styles
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap');
+
+/* ── Outer section ── */
+#ergonomics-section.ergo-section {
+    font-family: 'DM Sans', sans-serif;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 0;
+    background: linear-gradient(135deg, #ece9e2 0%, #e8e5de 50%, #eaeae4 100%);
+    min-height: 480px;
+    padding: 64px 48px;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+/* ── LEFT — Illustration pane ── */
+.ergo-visual {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    position: relative;
+    padding-bottom: 24px;
+}
+
+.ergo-illustration {
+    width: 100%;
+    max-width: 380px;
+    position: relative;
+}
+
+.ergo-svg {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Caption pill */
+.ergo-caption {
+    display: inline-block;
+    margin-top: 20px;
+    background: rgba(40, 40, 36, 0.72);
+    color: #f0ece4;
+    font-size: 0.82rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    padding: 8px 20px;
+    border-radius: 999px;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+/* ── RIGHT — Content pane ── */
+.ergo-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-left: 40px;
+}
+
+.ergo-title {
+    font-family: 'DM Sans', sans-serif;
+    font-size: clamp(1.5rem, 2.8vw, 2rem);
+    font-weight: 600;
+    color: #1c1c1a;
+    margin: 0 0 8px 0;
+    letter-spacing: -0.3px;
+}
+
+/* ── Tips list ── */
+.ergo-tips {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* ── Individual tip card ── */
+.ergo-tip {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    background: #f5f4f0;
+    border: 1px solid rgba(200, 198, 192, 0.5);
+    border-radius: 16px;
+    padding: 18px 24px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.04);
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+    cursor: default;
+}
+
+.ergo-tip:hover {
+    transform: translateX(4px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.07);
+}
+
+/* Active / highlighted first tip */
+.ergo-tip--active {
+    background: linear-gradient(135deg, #dceaf7 0%, #cfe0f2 100%);
+    border-color: rgba(160, 192, 230, 0.6);
+}
+
+/* Icon wrapper */
+.ergo-tip__icon {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.65);
+    border-radius: 10px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.ergo-tip__icon svg {
+    width: 28px;
+    height: 28px;
+}
+
+/* Tip text */
+.ergo-tip p {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #2a2a28;
+    line-height: 1.45;
+}
+
+/* ── Divider between left & right panes ── */
+#ergonomics-section.ergo-section::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 12%;
+    height: 76%;
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, rgba(180, 178, 172, 0.4), transparent);
+    pointer-events: none;
+}
+
+/* Need position relative on section for the pseudo-element */
+#ergonomics-section.ergo-section {
+    position: relative;
+}
+
+/* ── Responsive ── */
+@media (max-width: 860px) {
+    #ergonomics-section.ergo-section {
+        grid-template-columns: 1fr;
+        padding: 48px 28px;
+        gap: 40px;
+    }
+
+    #ergonomics-section.ergo-section::after {
+        display: none;
+    }
+
+    .ergo-content {
+        padding-left: 0;
+    }
+
+    .ergo-illustration {
+        max-width: 300px;
+        margin: 0 auto;
+    }
+}
+
+@media (max-width: 480px) {
+    #ergonomics-section.ergo-section {
+        padding: 36px 18px;
+    }
+
+    .ergo-tip p {
+        font-size: 0.9rem;
+    }
+}

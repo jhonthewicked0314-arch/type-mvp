@@ -24,6 +24,7 @@ let timerInterval = null;
 let isPlaying = false;
 let isSoundOn = false; // NEW: Sound state
 let isTabPressed = false; // NEW: Shortcut state
+let typingOverlay;
 
 // --- CUSTOM AUDIO FILES ---
 // NOTE: Change these filenames to match whatever you named your downloaded files!
@@ -82,21 +83,26 @@ let previousInputLength = 0; // NEW: Helps us stop duplicate counting
 
 // --- 4. INITIALIZATION & RESTART LOGIC (Main Test) ---
 function setupGame() {
+    // 1. Reset all variables
     clearInterval(timerInterval);
     timeLeft = testTime;
     isPlaying = false;
     currentTestErrors = {};
     previousInputLength = 0;
 
-    clearInterval(timerInterval);
-    timeLeft = testTime;
-    isPlaying = false;
-    hiddenInput.disabled = false;
-    hiddenInput.value = '';
+    // 2. Clear UI displays
     wordsDisplay.innerHTML = '';
     timerDisplay.innerText = timeLeft;
     wpmDisplay.innerText = 0;
 
+    // 3. STRICT LOCK: Disable the input and show the blur overlay
+    hiddenInput.value = '';
+    hiddenInput.disabled = true;
+    if (typingOverlay) {
+        typingOverlay.classList.remove('hidden');
+    }
+
+    // 4. Generate the random text
     let randomWordsArray = [];
     for (let i = 0; i < 30; i++) {
         const randomIndex = Math.floor(Math.random() * wordsList.length);
@@ -110,9 +116,9 @@ function setupGame() {
         wordsDisplay.appendChild(span);
     });
 
-    hiddenInput.focus();
+    // NOTE: Notice there is NO hiddenInput.focus() here! 
+    // It stays locked until they click the overlay!
 }
-
 // --- 5. THE TYPING LOGIC (Main Test) ---
 function handleInputLogic() {
     if (!isPlaying) {
@@ -510,6 +516,7 @@ function renderChart(labels, wpmData) {
 
 // --- MAIN SCRIPT EXECUTION - ENSURE DOM IS LOADED ---
 document.addEventListener('DOMContentLoaded', () => {
+    typingOverlay = document.getElementById('typing-overlay');
     // --- 2. DOM ELEMENTS (DEFINED AFTER DOM IS READY) ---
     wordsDisplay = document.getElementById('words-display');
     hiddenInput = document.getElementById('hidden-input');
@@ -525,8 +532,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- EVENT LISTENERS (ATTACHED AFTER DOM IS READY) ---
     // Force focus on the hidden input anytime you click the main test section
-    mainTestSection.addEventListener('click', () => { // Use the assigned variable
-        hiddenInput.focus();
+    // 1. STRICT: Only clicking the actual overlay hides it and grants focus
+    // 1. STRICT: Only clicking the actual overlay unlocks the keyboard
+    typingOverlay.addEventListener('click', (e) => {
+        e.stopPropagation();
+
+        // --- NEW STRICT LOGIC ---
+        hiddenInput.disabled = false; // 1. UNLOCK the keyboard
+        typingOverlay.classList.add('hidden'); // 2. Hide the blur
+        hiddenInput.focus(); // 3. Put the cursor in the box
+        // ------------------------
+    });
+
+    // 2. If they click the text area AFTER unlocking it, keep focus.
+    document.getElementById('typing-area-container').addEventListener('click', () => {
+        if (!hiddenInput.disabled) {
+            hiddenInput.focus();
+        }
     });
 
     // Listen for the main test restart button click
